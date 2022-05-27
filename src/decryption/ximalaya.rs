@@ -1,8 +1,12 @@
 use super::super::decryptor::{BaseDecryptorData, Decryptor};
 
-pub const XMLY_SCRAMBLE_SIZE: usize = 1024;
+const XMLY_SCRAMBLE_SIZE: usize = 1024;
 
-pub type X2MContentKey = [u8; 4];
+const X2MContentKeySize: usize = 0x04;
+const X3MContentKeySize: usize = 0x20;
+
+pub type X2MContentKey = [u8; X2MContentKeySize];
+pub type X3MContentKey = [u8; X3MContentKeySize];
 pub type ScrambleTable = [u16; XMLY_SCRAMBLE_SIZE];
 
 enum State {
@@ -39,7 +43,7 @@ impl<const KEY_SIZE: usize> Ximalaya<[u8; KEY_SIZE]> {
     }
 }
 
-impl Decryptor for Ximalaya<X2MContentKey> {
+impl<const KEY_SIZE: usize> Decryptor for Ximalaya<[u8; KEY_SIZE]> {
     fn get_data(&self) -> &BaseDecryptorData {
         &self.data
     }
@@ -68,3 +72,6 @@ impl Decryptor for Ximalaya<X2MContentKey> {
         true
     }
 }
+
+pub type XimalayaX2M = Ximalaya<X2MContentKey>;
+pub type XimalayaX3M = Ximalaya<X3MContentKey>;
