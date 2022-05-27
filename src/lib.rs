@@ -1,5 +1,6 @@
 mod decryption;
 mod decryptor;
+mod utils;
 
 #[cfg(test)]
 mod tests {
