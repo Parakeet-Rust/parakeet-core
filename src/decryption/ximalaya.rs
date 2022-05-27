@@ -17,8 +17,8 @@ pub struct Ximalaya<T> {
     scramble_table: ScrambleTable,
 }
 
-impl<const KeySize: usize> Ximalaya<[u8; KeySize]> {
-    pub fn new(key: [u8; KeySize], scramble_table: ScrambleTable) -> Self {
+impl<const KEY_SIZE: usize> Ximalaya<[u8; KEY_SIZE]> {
+    pub fn new(key: [u8; KEY_SIZE], scramble_table: ScrambleTable) -> Self {
         let data = BaseDecryptorData::new();
         Ximalaya {
             data,
@@ -32,7 +32,7 @@ impl<const KeySize: usize> Ximalaya<[u8; KeySize]> {
         let mut output = vec![0u8; XMLY_SCRAMBLE_SIZE];
         for (i, v) in output.iter_mut().enumerate() {
             let idx = usize::from(self.scramble_table[i]);
-            *v = self.data.buf_in[idx] ^ self.key[i % KeySize];
+            *v = self.data.buf_in[idx] ^ self.key[i % KEY_SIZE];
         }
         self.data.buf_out.append(&mut output);
         self.data.buf_in.drain(..XMLY_SCRAMBLE_SIZE);
