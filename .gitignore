@@ -3,3 +3,6 @@
 
 # Hardcode some key for testing as of now...
 /src/main.rs
+/sample/
+/local/
+*.tar.gz
