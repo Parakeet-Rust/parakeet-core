@@ -1,4 +1,4 @@
-use super::super::decryptor::{BaseDecryptorData, Decryptor};
+use crate::decryptor::{BaseDecryptorData, Decryptor};
 
 const XMLY_SCRAMBLE_SIZE: usize = 1024;
 
@@ -75,3 +75,48 @@ impl<const KEY_SIZE: usize> Decryptor for Ximalaya<[u8; KEY_SIZE]> {
 
 pub type XimalayaX2M = Ximalaya<X2MContentKey>;
 pub type XimalayaX3M = Ximalaya<X3MContentKey>;
+
+#[cfg(test)]
+pub mod test {
+    use super::{ScrambleTable, XimalayaX2M, XMLY_SCRAMBLE_SIZE};
+    use crate::{
+        decryption::ximalaya::X2MContentKeySize,
+        utils::test_util::test::{decrypt_test_content, generate_test_data, TEST_SIZE_1MB},
+    };
+    use std::convert::TryInto;
+
+    #[test]
+    fn test_xmly() {
+        let test_data = generate_test_data(TEST_SIZE_1MB, "x2m-test-data");
+        let x2m_content_key = generate_test_data(X2MContentKeySize, "x2m content key");
+
+        let mut x2m_scramble_table: ScrambleTable = [0u16; XMLY_SCRAMBLE_SIZE];
+        for (i, v) in x2m_scramble_table.iter_mut().enumerate() {
+            *v = i as u16;
+        }
+        let table_size = x2m_scramble_table.len();
+        let x2m_scramble_seed = generate_test_data(table_size * 2, "x2m seed");
+        for i in 0..table_size {
+            let n = u16::from_le_bytes(
+                x2m_scramble_seed[i * 2..i * 2 + 2]
+                    .try_into()
+                    .expect("incorrect length"),
+            ) as usize;
+            x2m_scramble_table.swap(i, n % table_size);
+        }
+
+        assert_eq!(x2m_content_key.len(), X2MContentKeySize);
+
+        let mut decryptor = XimalayaX2M::new(
+            x2m_content_key
+                .try_into()
+                .expect("could not format to array"),
+            x2m_scramble_table,
+        );
+        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        assert_eq!(
+            result,
+            "fd1ac1c4750f48b8d3c9562013f1c3202b12e45137b344995eda32a4f6b8a61f"
+        );
+    }
+}
