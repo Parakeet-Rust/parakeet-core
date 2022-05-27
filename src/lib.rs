@@ -1,3 +1,6 @@
+mod decryption;
+mod decryptor;
+
 #[cfg(test)]
 mod tests {
     #[test]

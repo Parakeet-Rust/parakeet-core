@@ -1,2 +1,5 @@
 /target
 /Cargo.lock
+
+# Hardcode some key for testing as of now...
+/src/main.rs
