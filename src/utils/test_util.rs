@@ -4,10 +4,15 @@ pub mod test {
     use crate::decryptor::Decryptor;
     use ring::digest::{Context, SHA256};
 
-    pub const TEST_SIZE_1MB: usize = 1 * 1024 * 1024;
+    #[allow(unused)]
+    pub const TEST_SIZE_1MB: usize = 1024 * 1024;
+    #[allow(unused)]
     pub const TEST_SIZE_2MB: usize = TEST_SIZE_1MB * 2;
+    #[allow(unused)]
     pub const TEST_SIZE_3MB: usize = TEST_SIZE_1MB * 3;
+    #[allow(unused)]
     pub const TEST_SIZE_4MB: usize = TEST_SIZE_1MB * 4;
+    #[allow(unused)]
     pub const TEST_SIZE_8MB: usize = TEST_SIZE_1MB * 8;
 
     pub fn generate_test_data(len: usize, name: &str) -> Vec<u8> {
@@ -50,8 +55,8 @@ pub mod test {
     }
 
     pub fn decrypt_test_content(decryptor: &mut impl Decryptor, data: &[u8]) -> String {
-        decryptor.init_footer(&data[..]);
-        decryptor.write(&data[..]);
+        decryptor.init_footer(data);
+        decryptor.write(data).unwrap();
         decryptor.end();
         sha256(decryptor.read_all_output().as_ref())
     }

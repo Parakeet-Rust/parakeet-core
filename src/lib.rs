@@ -1,5 +1,5 @@
-mod decryption;
-mod decryptor;
+pub mod decryption;
+pub mod decryptor;
 mod utils;
 
 #[cfg(test)]
