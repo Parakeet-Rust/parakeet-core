@@ -1,4 +1,8 @@
 {
     "rust-analyzer.checkOnSave.command": "clippy",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "cSpell.words": [
+        "Kugou",
+        "XMLY"
+    ]
 }
