@@ -1,9 +1,33 @@
+#[derive(Debug)]
+#[allow(dead_code)]
 pub struct BaseDecryptorData {
     pub(crate) name: String,
-    pub(crate) error: String,
     pub(crate) offset: usize,
     pub(crate) buf_in: Vec<u8>,
     pub(crate) buf_out: Vec<u8>,
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+pub enum DecryptErrorCode {
+    UnknownEncryption,
+    UnknownMagicHeader,
+}
+
+#[derive(Debug)]
+#[allow(dead_code)]
+pub struct DecryptError {
+    code: DecryptErrorCode,
+    str: String,
+}
+
+impl DecryptError {
+    pub fn new(code: DecryptErrorCode, str: &str) -> DecryptError {
+        DecryptError {
+            code,
+            str: str.into(),
+        }
+    }
 }
 
 impl BaseDecryptorData {
@@ -12,7 +36,6 @@ impl BaseDecryptorData {
             buf_in: vec![],
             buf_out: vec![],
             offset: 0,
-            error: String::new(),
             name: String::new(),
         }
     }
@@ -33,7 +56,11 @@ impl BaseDecryptorData {
         self.offset == offset
     }
 
-    fn read_all_output(&mut self) -> Vec<u8> {
+    pub(crate) fn consume_bytes(&mut self, len: usize) {
+        self.buf_in.drain(..len);
+    }
+
+    pub(crate) fn read_all_output(&mut self) -> Vec<u8> {
         let mut result: Vec<u8> = vec![];
         result.append(&mut self.buf_out);
         result
@@ -52,15 +79,7 @@ pub trait Decryptor {
         &self.get_data().name
     }
 
-    fn is_error(&self) -> bool {
-        !self.get_error().is_empty()
-    }
-
-    fn get_error(&self) -> &str {
-        &self.get_data().error
-    }
-
-    fn write(&mut self, data: &[u8]) -> bool;
+    fn write(&mut self, data: &[u8]) -> Result<(), DecryptError>;
     fn read_all_output(&mut self) -> Vec<u8> {
         self.get_data_mut().read_all_output()
     }
