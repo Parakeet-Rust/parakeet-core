@@ -82,10 +82,7 @@ mod detail {
         }
     }
 
-    struct Kugou<T>
-    where
-        T: KugouAlgo,
-    {
+    struct Kugou<T: KugouAlgo> {
         data: BaseDecryptorData,
         state: State,
 
@@ -96,10 +93,7 @@ mod detail {
         detail: T,
     }
 
-    impl<T> Kugou<T>
-    where
-        T: KugouAlgo,
-    {
+    impl<T: KugouAlgo> Kugou<T> {
         pub fn new(
             t1: &KugouInternalTable,
             t2: &KugouInternalTable,
@@ -157,10 +151,7 @@ mod detail {
         }
     }
 
-    impl<T> Decryptor for Kugou<T>
-    where
-        T: KugouAlgo,
-    {
+    impl<T: KugouAlgo> Decryptor for Kugou<T> {
         #[inline(always)]
         fn get_data(&self) -> &BaseDecryptorData {
             &self.data

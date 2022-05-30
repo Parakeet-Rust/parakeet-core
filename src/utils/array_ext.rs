@@ -25,7 +25,7 @@ pub trait ArrayExtension<T: PrimInt> {
     fn get_mod_n(&self, i: usize) -> T;
 }
 
-impl<T: PrimInt, const SIZE: usize> ArrayExtension<T> for [T; SIZE] {
+impl<T: PrimInt> ArrayExtension<T> for [T] {
     #[inline(always)]
     fn get_mod_n(&self, i: usize) -> T {
         self[i % self.len()]
@@ -34,18 +34,28 @@ impl<T: PrimInt, const SIZE: usize> ArrayExtension<T> for [T; SIZE] {
 
 pub trait ByteSliceExt {
     fn read_le<R: PrimInt + EndianOp>(&self, offset: usize) -> R;
+
+    fn xor_key_with_key_offset<T: AsRef<[u8]>>(&mut self, key: T, offset: usize);
+    #[inline(always)]
+    fn xor_key<T: AsRef<[u8]>>(&mut self, key: T) {
+        self.xor_key_with_key_offset(key, 0)
+    }
 }
 
-macro_rules! impl_byte_slice_ext (( $($type:ty),* ) => {
-    $(
-        impl ByteSliceExt for $type {
-            #[inline(always)]
-            fn read_le<R: PrimInt + EndianOp>(&self, offset: usize) -> R {
-                R::from_le_bytes(&self[offset..])
-            }
-        }
-    )*
-});
+impl ByteSliceExt for [u8] {
+    #[inline(always)]
+    fn read_le<R: PrimInt + EndianOp>(&self, offset: usize) -> R {
+        R::from_le_bytes(&self[offset..])
+    }
 
-impl_byte_slice_ext!([u8]);
-impl_byte_slice_ext!(Vec<u8>);
+    #[inline(always)]
+    fn xor_key_with_key_offset<T: AsRef<[u8]>>(&mut self, key: T, offset: usize) {
+        let key = key.as_ref();
+        let n = key.len();
+        let offset = offset % n;
+
+        for (i, v) in self.iter_mut().enumerate() {
+            *v ^= key[(offset + i) % n];
+        }
+    }
+}
