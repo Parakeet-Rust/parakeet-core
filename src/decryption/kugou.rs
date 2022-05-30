@@ -95,13 +95,14 @@ mod detail {
 
     impl<T: KugouAlgo> Kugou<T> {
         pub fn new(
+            name: &str,
             t1: &KugouInternalTable,
             t2: &KugouInternalTable,
             v2: &KugouInternalTable,
             detail: T,
         ) -> Kugou<T> {
             Kugou {
-                data: BaseDecryptorData::new(),
+                data: BaseDecryptorData::new(name),
                 state: State::ReadFileMagic,
                 t1: *t1,
                 t2: *t2,
@@ -210,7 +211,7 @@ mod detail {
         t2: &KugouInternalTable,
         v2: &KugouInternalTable,
     ) -> impl Decryptor {
-        Kugou::new(t1, t2, v2, KugouKGM::new())
+        Kugou::new("Kugou(KGM)", t1, t2, v2, KugouKGM::new())
     }
 
     pub fn new_vpr(
@@ -219,7 +220,7 @@ mod detail {
         v2: &KugouInternalTable,
         vpr_key: &KugouVPRKey,
     ) -> impl Decryptor {
-        Kugou::new(t1, t2, v2, KugouVPR::new(vpr_key))
+        Kugou::new("Kugou(VPR)", t1, t2, v2, KugouVPR::new(vpr_key))
     }
 }
 

@@ -31,12 +31,12 @@ impl DecryptError {
 }
 
 impl BaseDecryptorData {
-    pub fn new() -> Self {
+    pub fn new(name: &str) -> Self {
         BaseDecryptorData {
             buf_in: vec![],
             buf_out: vec![],
             offset: 0,
-            name: String::new(),
+            name: String::from(name),
         }
     }
 

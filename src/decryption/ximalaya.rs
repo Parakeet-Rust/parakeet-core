@@ -26,8 +26,8 @@ mod detail {
     }
 
     impl<const KEY_SIZE: usize> Ximalaya<[u8; KEY_SIZE]> {
-        pub fn new(key: [u8; KEY_SIZE], scramble_table: ScrambleTable) -> Self {
-            let data = BaseDecryptorData::new();
+        pub fn new(name: &str, key: [u8; KEY_SIZE], scramble_table: ScrambleTable) -> Self {
+            let data = BaseDecryptorData::new(name);
             Ximalaya {
                 data,
                 key,
@@ -79,11 +79,11 @@ mod detail {
     }
 
     pub fn new_x2m(key: X2MContentKey, scramble_table: ScrambleTable) -> impl Decryptor {
-        Ximalaya::new(key, scramble_table)
+        Ximalaya::new("Ximalaya(X2M)", key, scramble_table)
     }
 
     pub fn new_x3m(key: X3MContentKey, scramble_table: ScrambleTable) -> impl Decryptor {
-        Ximalaya::new(key, scramble_table)
+        Ximalaya::new("Ximalaya(X3M)", key, scramble_table)
     }
 }
 
