@@ -12,6 +12,9 @@ pub struct BaseDecryptorData {
 pub enum DecryptErrorCode {
     UnknownEncryption,
     UnknownMagicHeader,
+    InvalidBlockSize,
+    AESParamError,
+    InvalidNCMContentKey,
 }
 
 #[derive(Debug)]
@@ -56,9 +59,29 @@ impl BaseDecryptorData {
         self.offset == offset
     }
 
+    pub(crate) fn read_block(&mut self, data: &mut &[u8], size: usize) -> bool {
+        if self.buf_in.len() < size {
+            let read_size = std::cmp::min(data.len(), size - self.buf_in.len());
+            if read_size == 0 {
+                return false;
+            }
+
+            let (to_buffer, left_over) = data.split_at(read_size);
+            self.buf_in.extend_from_slice(to_buffer);
+            *data = left_over;
+        }
+
+        self.buf_in.len() == size
+    }
 
     pub(crate) fn seek_input(&mut self, len: usize) {
         self.buf_in.drain(..len);
+    }
+
+    pub(crate) fn consume_input(&mut self, len: usize) -> Vec<u8> {
+        let result = Vec::from(&self.buf_in[..len]);
+        self.seek_input(len);
+        result
     }
 
     pub(crate) fn read_all_output(&mut self) -> Vec<u8> {
