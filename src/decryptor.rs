@@ -56,7 +56,8 @@ impl BaseDecryptorData {
         self.offset == offset
     }
 
-    pub(crate) fn consume_bytes(&mut self, len: usize) {
+
+    pub(crate) fn seek_input(&mut self, len: usize) {
         self.buf_in.drain(..len);
     }
 

@@ -71,7 +71,7 @@ mod detail {
                             }
 
                             self.init_key();
-                            self.data.consume_bytes(FULL_HEADER_SIZE);
+                            self.data.seek_input(FULL_HEADER_SIZE);
                             self.state = State::Decrypt;
                         }
                     }

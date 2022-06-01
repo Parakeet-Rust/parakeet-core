@@ -43,7 +43,7 @@ mod detail {
                 *v = self.data.buf_in[idx] ^ self.key.get_mod_n(i);
             }
             self.data.buf_out.append(&mut output);
-            self.data.consume_bytes(XMLY_SCRAMBLE_SIZE);
+            self.data.seek_input(XMLY_SCRAMBLE_SIZE);
         }
     }
 

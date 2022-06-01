@@ -192,7 +192,7 @@ mod detail {
                         if self.data.read_until_offset(&mut p, n) {
                             self.state = State::Decrypt;
                             self.data.offset = 0;
-                            self.data.consume_bytes(n);
+                            self.data.seek_input(n);
                         }
                     }
 
