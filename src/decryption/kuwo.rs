@@ -11,7 +11,7 @@ mod detail {
 
     const FILE_KEY_OFFSET: usize = 0x18;
     const FULL_HEADER_SIZE: usize = 0x400;
-    const KUWO_MAGIC_HEADER: [u8; 0x10] = [
+    const KUWO_MAGIC_HEADER: &[u8; 0x10] = &[
         0x79u8, 0x65, 0x65, 0x6c, 0x69, 0x6f, 0x6e, 0x2d, //
         0x6bu8, 0x75, 0x77, 0x6f, 0x2d, 0x74, 0x6d, 0x65, //
     ];
@@ -61,7 +61,7 @@ mod detail {
                 match self.state {
                     State::WaitForHeader => {
                         if self.data.read_until_offset(&mut p, FULL_HEADER_SIZE) {
-                            if self.data.buf_in[..KUWO_MAGIC_HEADER.len()].cmp(&KUWO_MAGIC_HEADER)
+                            if self.data.buf_in[..KUWO_MAGIC_HEADER.len()].cmp(KUWO_MAGIC_HEADER)
                                 != Ordering::Equal
                             {
                                 return Err(DecryptError::new(
