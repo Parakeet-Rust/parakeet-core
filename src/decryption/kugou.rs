@@ -141,8 +141,11 @@ mod detail {
             let mut out = vec![0u8; size];
 
             let offset = self.data.offset;
-            for i in 0..size {
-                out[i] = self.decrypt_byte(data[i], offset + i);
+            for (i, v) in data.iter().enumerate() {
+                let v = self.decrypt_byte(*v, offset + i);
+                unsafe {
+                    out.set_unchecked(i, v);
+                }
             }
 
             self.data.buf_out.append(&mut out);

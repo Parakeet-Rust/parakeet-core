@@ -34,7 +34,7 @@ pub trait ArrayExtension<T: PrimInt> {
 impl<T: PrimInt> ArrayExtension<T> for [T] {
     #[inline(always)]
     fn get_mod_n(&self, i: usize) -> T {
-        self[i % self.len()]
+        unsafe { *self.get_unchecked(i % self.len()) }
     }
 }
 
@@ -46,6 +46,8 @@ pub trait ByteSliceExt {
     fn xor_key<T: AsRef<[u8]>>(&mut self, key: T) {
         self.xor_key_with_key_offset(key, 0)
     }
+
+    unsafe fn set_unchecked(&mut self, i: usize, value: u8);
 }
 
 impl ByteSliceExt for [u8] {
@@ -61,7 +63,12 @@ impl ByteSliceExt for [u8] {
         let offset = offset % n;
 
         for (i, v) in self.iter_mut().enumerate() {
-            *v ^= key[(offset + i) % n];
+            *v ^= key.get_mod_n(offset + i);
         }
+    }
+
+    #[inline(always)]
+    unsafe fn set_unchecked(&mut self, i: usize, value: u8) {
+        *self.get_unchecked_mut(i) = value;
     }
 }
