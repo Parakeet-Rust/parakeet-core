@@ -1,7 +1,10 @@
 #[cfg(test)]
 pub mod test {
 
-    use crate::decryptor::Decryptor;
+    use crate::{
+        decryptor::Decryptor,
+        utils::rc4::{RC4Derive, RC4Standard},
+    };
     use ring::digest::{Context, SHA256};
 
     #[allow(unused)]
@@ -18,30 +21,9 @@ pub mod test {
     pub fn generate_test_data(len: usize, name: &str) -> Vec<u8> {
         let mut result = vec![0u8; len];
 
-        let mut s = [0u8; 256];
-        let key = name.as_bytes();
-        let key_len = key.len();
-
-        for (i, v) in s.iter_mut().enumerate() {
-            *v = i as u8;
-        }
-
-        let mut j = 0u8;
-        for i in 0..256 {
-            j = j.wrapping_add(s[i]).wrapping_add(key[i % key_len]);
-            s.swap(i, usize::from(j));
-        }
-
-        let mut x = 0u8;
-        let mut y = 0u8;
-        for out in result.iter_mut() {
-            x = x.wrapping_add(1);
-            y = y.wrapping_add(s[usize::from(x)]);
-            s.swap(usize::from(x), usize::from(y));
-
-            let xx = s[usize::from(x)];
-            let yy = s[usize::from(y)];
-            *out = s[usize::from(xx.wrapping_add(yy))];
+        let mut rc4 = RC4Standard::new(name.as_bytes());
+        for v in result.iter_mut() {
+            *v = rc4.next();
         }
 
         result
