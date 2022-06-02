@@ -43,6 +43,7 @@ impl BaseDecryptorData {
         }
     }
 
+    #[inline(always)]
     pub(crate) fn read_until_offset(&mut self, data: &mut &[u8], offset: usize) -> bool {
         if self.offset < offset {
             let read_size = std::cmp::min(data.len(), offset - self.offset);
@@ -59,6 +60,7 @@ impl BaseDecryptorData {
         self.offset == offset
     }
 
+    #[inline(always)]
     pub(crate) fn read_block(&mut self, data: &mut &[u8], size: usize) -> bool {
         if self.buf_in.len() < size {
             let read_size = std::cmp::min(data.len(), size - self.buf_in.len());
@@ -74,16 +76,19 @@ impl BaseDecryptorData {
         self.buf_in.len() == size
     }
 
+    #[inline(always)]
     pub(crate) fn seek_input(&mut self, len: usize) {
         self.buf_in.drain(..len);
     }
 
+    #[inline(always)]
     pub(crate) fn consume_input(&mut self, len: usize) -> Vec<u8> {
         let result = Vec::from(&self.buf_in[..len]);
         self.seek_input(len);
         result
     }
 
+    #[inline(always)]
     pub(crate) fn read_all_output(&mut self) -> Vec<u8> {
         let mut result: Vec<u8> = vec![];
         result.append(&mut self.buf_out);
