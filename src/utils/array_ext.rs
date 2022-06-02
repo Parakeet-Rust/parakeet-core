@@ -12,8 +12,14 @@ macro_rules! impl_endian_op (( $($int:ident),* ) => {
     $(
         impl EndianOp for $int {
             type Array = [u8; std::mem::size_of::<Self>()];
-            fn from_le_bytes(bytes: &[u8]) -> Self { Self::from_le_bytes(bytes[..size_of::<Self>()].try_into().expect("invalid bytes size")) }
-            fn from_be_bytes(bytes: &[u8]) -> Self { Self::from_be_bytes(bytes[..size_of::<Self>()].try_into().expect("invalid bytes size")) }
+            #[inline(always)]
+            fn from_le_bytes(bytes: &[u8]) -> Self {
+                Self::from_le_bytes(bytes[..size_of::<Self>()].try_into().unwrap())
+            }
+            #[inline(always)]
+            fn from_be_bytes(bytes: &[u8]) -> Self {
+                Self::from_be_bytes(bytes[..size_of::<Self>()].try_into().unwrap())
+            }
         }
     )*
 });
