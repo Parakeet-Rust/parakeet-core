@@ -71,3 +71,30 @@ impl RC4Derive for RC4Standard {
         self.s.get_and_add(self.i, self.j)
     }
 }
+
+pub struct RC4Netease {
+    s: RC4State,
+    i: u8,
+}
+
+impl RC4Netease {
+    #[inline(always)]
+    pub fn new<T: AsRef<[u8]>>(key: T) -> Self {
+        Self {
+            s: RC4State::new(key),
+            i: 0,
+        }
+    }
+}
+
+impl RC4Derive for RC4Netease {
+    #[inline(always)]
+    fn next(&mut self) -> u8 {
+        self.i = self.i.wrapping_add(1);
+
+        let i = self.i;
+        let j = self.s.get(i).wrapping_add(i);
+
+        self.s.get_and_add(i, j)
+    }
+}

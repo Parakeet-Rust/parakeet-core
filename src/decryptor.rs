@@ -14,7 +14,8 @@ pub enum DecryptErrorCode {
     UnknownMagicHeader,
     InvalidBlockSize,
     AESParamError,
-    InvalidNCMContentKey,
+    NCMInvalidContentKey,
+    NCMCoverFrameTooSmall,
 }
 
 #[derive(Debug)]
