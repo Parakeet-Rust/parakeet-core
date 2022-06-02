@@ -92,7 +92,7 @@ impl BaseDecryptorData {
     #[inline(always)]
     pub(crate) fn read_all_output(&mut self) -> Vec<u8> {
         let mut result: Vec<u8> = vec![];
-        result.append(&mut self.buf_out);
+        std::mem::swap(&mut self.buf_out, &mut result);
         result
     }
 }

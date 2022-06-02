@@ -37,12 +37,12 @@ mod detail {
         }
 
         fn do_header_decryption(&mut self) {
-            let mut output = vec![0u8; XMLY_SCRAMBLE_SIZE];
+            let mut output = [0u8; XMLY_SCRAMBLE_SIZE];
             for (i, v) in output.iter_mut().enumerate() {
                 let idx = usize::from(self.scramble_table[i]);
                 *v = self.data.buf_in[idx] ^ self.key.get_mod_n(i);
             }
-            self.data.buf_out.append(&mut output);
+            self.data.buf_out.extend_from_slice(&output);
             self.data.seek_input(XMLY_SCRAMBLE_SIZE);
         }
     }
