@@ -27,14 +27,44 @@ macro_rules! impl_endian_op (( $($int:ident),* ) => {
 impl_endian_op!(u8, u16, u32, u64, u128, usize);
 impl_endian_op!(i8, i16, i32, i64, i128, isize);
 
+pub trait USizeable {
+    fn to_usize(&self) -> usize;
+}
+
+macro_rules! impl_unsigned_sizeable_from (( $($int:ident),* ) => {
+    $(
+        impl USizeable for $int {
+            #[inline(always)]
+            fn to_usize(&self) -> usize {
+                *self as usize
+            }
+        }
+    )*
+});
+impl_unsigned_sizeable_from!(u8, u16, u32, usize);
+
 pub trait ArrayExtension<T: PrimInt> {
-    fn get_mod_n(&self, i: usize) -> T;
+    fn get_mod_n<I: USizeable>(&self, i: I) -> T;
+    fn get_value_unchecked<I: USizeable>(&self, i: I) -> T;
 }
 
 impl<T: PrimInt> ArrayExtension<T> for [T] {
     #[inline(always)]
-    fn get_mod_n(&self, i: usize) -> T {
-        unsafe { *self.get_unchecked(i % self.len()) }
+    fn get_value_unchecked<I: USizeable>(&self, i: I) -> T {
+        unsafe { *self.get_unchecked(i.to_usize()) }
+    }
+    #[inline(always)]
+    fn get_mod_n<I: USizeable>(&self, i: I) -> T {
+        let i = i.to_usize();
+
+        // faster mod for our use case.
+        // we usually pass in a large offset to look-up values from
+        //   a small table, which is faster than doing div/mul for
+        //   modular calculation.
+        // src: https://stackoverflow.com/a/33333924
+        let n = self.len();
+        let i = if i < n { i } else { i % n };
+        self.get_value_unchecked(i)
     }
 }
 

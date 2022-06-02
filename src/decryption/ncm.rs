@@ -249,8 +249,6 @@ pub use detail::new_ncm;
 
 #[cfg(test)]
 mod test {
-    use ring::rand::generate;
-
     use crate::{
         decryption::ncm::NCM_DECRYPTION_KEY_SIZE,
         utils::test_util::test::{decrypt_test_content, generate_test_data, TEST_SIZE_4MB},

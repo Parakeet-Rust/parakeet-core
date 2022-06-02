@@ -53,6 +53,7 @@ pub struct RC4Standard {
 
 impl RC4Standard {
     #[inline(always)]
+    #[allow(dead_code)]
     pub fn new<T: AsRef<[u8]>>(key: T) -> Self {
         Self {
             s: RC4State::new(key),

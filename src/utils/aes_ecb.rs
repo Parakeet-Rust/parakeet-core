@@ -147,7 +147,6 @@ pub(crate) mod detail {
     {
         #[inline(always)]
         fn proc_block(&mut self, mut block: InOut<'_, '_, Block<Self>>) {
-            let in_block = block.clone_in();
             let mut t = block.clone_in();
             self.backend.proc_block((&mut t).into());
             *block.get_out() = t;
@@ -155,11 +154,9 @@ pub(crate) mod detail {
 
         #[inline(always)]
         fn proc_par_blocks(&mut self, mut blocks: InOut<'_, '_, ParBlocks<Self>>) {
-            let in_blocks = blocks.clone_in();
             let mut t = blocks.clone_in();
 
             self.backend.proc_par_blocks((&mut t).into());
-            let n = t.len();
             *blocks.get_out() = t;
         }
     }
