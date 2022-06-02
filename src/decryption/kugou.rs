@@ -138,15 +138,13 @@ mod detail {
         #[inline]
         fn decrypt(&mut self, data: &[u8]) -> Result<(), DecryptError> {
             let size = data.len();
-            let mut out = vec![0u8; size];
-
             let offset = self.data.offset;
-            for (i, v) in data.iter().enumerate() {
-                let v = self.decrypt_byte(*v, offset + i);
-                unsafe {
-                    out.set_unchecked(i, v);
-                }
-            }
+
+            let mut out = data
+                .iter()
+                .enumerate()
+                .map(|(i, v)| -> u8 { self.decrypt_byte(*v, offset + i) })
+                .collect();
 
             self.data.buf_out.append(&mut out);
             self.data.offset += size;
