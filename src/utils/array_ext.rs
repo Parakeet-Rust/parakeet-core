@@ -65,6 +65,9 @@ impl_unsigned_sizeable_from!(u8, u16, u32, usize);
 pub trait ArrayExtension<T: PrimInt> {
     fn get_mod_n<I: USizeable>(&self, i: I) -> T;
     fn get_value_unchecked<I: USizeable>(&self, i: I) -> T;
+
+    fn swap_unsigned_index<I: USizeable, J: USizeable>(&mut self, a: I, b: J);
+    fn at<I: USizeable>(&self, a: I) -> T;
 }
 
 impl<T: PrimInt> ArrayExtension<T> for [T] {
@@ -84,6 +87,14 @@ impl<T: PrimInt> ArrayExtension<T> for [T] {
         let n = self.len();
         let i = if i < n { i } else { i % n };
         self.get_value_unchecked(i)
+    }
+    #[inline(always)]
+    fn swap_unsigned_index<I: USizeable, J: USizeable>(&mut self, a: I, b: J) {
+        self.swap(a.to_usize(), b.to_usize());
+    }
+    #[inline(always)]
+    fn at<I: USizeable>(&self, a: I) -> T {
+        self[a.to_usize()]
     }
 }
 
