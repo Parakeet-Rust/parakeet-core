@@ -1,5 +1,4 @@
 #[derive(Debug)]
-#[allow(dead_code)]
 pub struct BaseDecryptorData {
     pub(crate) name: String,
     pub(crate) offset: usize,
@@ -8,7 +7,6 @@ pub struct BaseDecryptorData {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
 pub enum DecryptErrorCode {
     UnknownEncryption,
     UnknownMagicHeader,

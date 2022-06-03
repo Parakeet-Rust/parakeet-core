@@ -43,9 +43,7 @@ mod detail {
         data: BaseDecryptorData,
         extra_cache_value: u8,
         cache: [u8; STATIC_CIPHER_PAGE_SIZE],
-
-        #[allow(dead_code)]
-        algo: T,
+        _algo: T,
     }
 
     impl<T: QmcV1Algo> QMCv1<T> {
@@ -55,7 +53,7 @@ mod detail {
                 data: BaseDecryptorData::new("QMCv1"),
                 extra_cache_value: 0,
                 cache: [0u8; STATIC_CIPHER_PAGE_SIZE],
-                algo: T::new(),
+                _algo: T::new(),
             };
 
             result.init_cache(key.as_ref());
