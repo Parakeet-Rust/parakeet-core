@@ -6,5 +6,8 @@
         "Kuwo",
         "Netease",
         "XMLY"
+    ],
+    "editor.rulers": [
+        100
     ]
 }
