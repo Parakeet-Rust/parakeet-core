@@ -41,7 +41,6 @@ mod detail {
 
     struct QMCv1<T: QmcV1Algo> {
         data: BaseDecryptorData,
-        key: Vec<u8>,
         extra_cache_value: u8,
         cache: [u8; STATIC_CIPHER_PAGE_SIZE],
 
@@ -54,23 +53,21 @@ mod detail {
         pub fn new<K: AsRef<[u8]>>(key: K) -> Self {
             let mut result = Self {
                 data: BaseDecryptorData::new("QMCv1"),
-                key: Vec::from(key.as_ref()),
                 extra_cache_value: 0,
                 cache: [0u8; STATIC_CIPHER_PAGE_SIZE],
                 algo: T::new(),
             };
 
-            result.init_cache();
+            result.init_cache(key.as_ref());
             result
         }
 
         #[inline(always)]
-        fn init_cache(&mut self) {
+        fn init_cache(&mut self, key: &[u8]) {
             for (i, v) in self.cache.iter_mut().enumerate() {
-                *v = T::get_mask(&self.key, i);
+                *v = T::get_mask(key, i);
             }
-            self.extra_cache_value =
-                self.cache[0] ^ T::get_mask(&self.key, STATIC_CIPHER_PAGE_SIZE);
+            self.extra_cache_value = self.cache[0] ^ T::get_mask(key, STATIC_CIPHER_PAGE_SIZE);
         }
     }
 
