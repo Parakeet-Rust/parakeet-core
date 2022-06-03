@@ -2,6 +2,25 @@ use std::mem::size_of;
 
 use num_traits::PrimInt;
 
+pub trait VecExtension {
+    fn append_of_size(&mut self, len: usize) -> &mut [u8];
+    fn append_data<T: AsRef<[u8]>>(&mut self, data: T) -> &mut [u8];
+}
+
+impl VecExtension for Vec<u8> {
+    fn append_of_size(&mut self, len: usize) -> &mut [u8] {
+        let i = self.len();
+        let mut data = vec![0u8; len];
+        self.append(&mut data);
+        &mut self[i..]
+    }
+    fn append_data<T: AsRef<[u8]>>(&mut self, data: T) -> &mut [u8] {
+        let i = self.len();
+        self.extend_from_slice(data.as_ref());
+        &mut self[i..]
+    }
+}
+
 pub trait EndianOp {
     type Array;
     fn from_le_bytes(bytes: &[u8]) -> Self;
@@ -90,10 +109,15 @@ impl ByteSliceExt for [u8] {
     fn xor_key_with_key_offset<T: AsRef<[u8]>>(&mut self, key: T, offset: usize) {
         let key = key.as_ref();
         let n = key.len();
-        let offset = offset % n;
+        let mut offset = offset % n;
 
-        for (i, v) in self.iter_mut().enumerate() {
-            *v ^= key.get_mod_n(offset + i);
+        for v in self.iter_mut() {
+            *v ^= key.get_value_unchecked(offset);
+
+            offset += 1;
+            if offset == n {
+                offset = 0;
+            }
         }
     }
 
