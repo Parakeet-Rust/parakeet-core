@@ -96,9 +96,6 @@ impl BaseDecryptorData {
 }
 
 pub trait Decryptor {
-    fn init_footer(&mut self, _footer: &[u8]) -> bool {
-        true
-    }
     fn end(&mut self) -> bool {
         true
     }
