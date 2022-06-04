@@ -114,7 +114,7 @@ mod test {
         ]);
 
         let mut decryptor = super::new_kwm(test_key[..].try_into().unwrap());
-        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,
             "aefad6b6f75ecb915fd0211f02eeacbd9c28e51b22c06c6d1bb3c61c963feaae"

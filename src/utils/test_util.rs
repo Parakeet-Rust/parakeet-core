@@ -36,7 +36,8 @@ pub mod test {
         return data_encoding::HEXLOWER.encode(result.as_ref());
     }
 
-    pub fn decrypt_test_content(decryptor: &mut impl Decryptor, data: &[u8]) -> String {
+    pub fn decrypt_test_content<T: AsRef<[u8]>>(decryptor: &mut impl Decryptor, data: T) -> String {
+        let data = data.as_ref();
         decryptor.init_footer(data);
         decryptor.write(data).unwrap();
         decryptor.end();

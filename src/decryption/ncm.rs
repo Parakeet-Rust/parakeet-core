@@ -291,7 +291,7 @@ mod test {
         test_data[..header_override.len()].copy_from_slice(header_override);
 
         let mut decryptor = super::new_ncm(test_key[..].try_into().unwrap());
-        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,
             "dae77d29821092561702e3cde97add3558f21a1607c9aab0599983632ce0d54b"

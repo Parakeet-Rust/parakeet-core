@@ -126,7 +126,7 @@ pub mod test {
                 .expect("could not format to array"),
             x2m_scramble_table,
         );
-        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,
             "fd1ac1c4750f48b8d3c9562013f1c3202b12e45137b344995eda32a4f6b8a61f"
@@ -157,7 +157,7 @@ pub mod test {
                 .expect("could not format to array"),
             x3m_scramble_table,
         );
-        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,
             "a10bbfdcdbd388373361da6baf35c80b725f7310c3eca29d7dcf228e397a8c5a"

@@ -258,7 +258,7 @@ pub mod test {
             v2[..].try_into().unwrap(),
         );
 
-        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,
             "7260037c367e8782c9ea4727d12e9d1f53d30b25d262531ef9170e9adbafb3c3"
@@ -288,7 +288,7 @@ pub mod test {
             vpr_key[..].try_into().unwrap(),
         );
 
-        let result = decrypt_test_content(&mut decryptor, test_data.as_ref());
+        let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,
             "9f8786693b334d074b0ef5c573672c9cf290fae204b285240c18f93cd7ebaca5"
