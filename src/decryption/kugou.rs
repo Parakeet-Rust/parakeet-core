@@ -11,6 +11,7 @@ mod detail {
 
     use crate::{
         decryptor::{BaseDecryptorData, DecryptError, DecryptErrorCode, Decryptor},
+        impl_decryptor_inner_helper,
         utils::array_ext::{ArrayExtension, ByteSliceExt},
     };
 
@@ -154,14 +155,7 @@ mod detail {
     }
 
     impl<T: KugouAlgo> Decryptor for Kugou<T> {
-        #[inline(always)]
-        fn get_data(&self) -> &BaseDecryptorData {
-            &self.data
-        }
-        #[inline(always)]
-        fn get_data_mut(&mut self) -> &mut BaseDecryptorData {
-            &mut self.data
-        }
+        impl_decryptor_inner_helper! {}
 
         fn write(&mut self, data: &[u8]) -> Result<(), DecryptError> {
             let mut p = data;

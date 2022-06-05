@@ -2,9 +2,13 @@
     "rust-analyzer.checkOnSave.command": "clippy",
     "editor.formatOnSave": true,
     "cSpell.words": [
+        "Decryptor",
+        "ekey",
         "Kugou",
         "Kuwo",
         "Netease",
+        "qtag",
+        "ximalaya",
         "XMLY"
     ],
     "editor.rulers": [

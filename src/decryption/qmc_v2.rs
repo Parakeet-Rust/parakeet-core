@@ -1,6 +1,7 @@
 mod detail {
     use crate::{
         decryptor::{BaseDecryptorData, DecryptError, Decryptor},
+        impl_decryptor_inner_helper,
         utils::{
             array_ext::ArrayExtension,
             rc4::{rc4::RC4Derive, RC4TencentQmcV2},
@@ -29,9 +30,9 @@ mod detail {
     }
 
     impl QMCv2 {
-        pub fn new<T: AsRef<[u8]>>(key: T) -> Self {
+        pub fn new<T: AsRef<[u8]>>(key: T, reserved_eof: usize) -> Self {
             Self {
-                data: BaseDecryptorData::new("QMCv2(RC4)"),
+                data: BaseDecryptorData::new_with_eof_reserve("QMCv2(RC4)", reserved_eof),
                 state: State::DecryptFirstSegment,
                 key: Vec::from(key.as_ref()),
                 key_hash: Self::calculate_key_hash(key.as_ref()),
@@ -125,15 +126,7 @@ mod detail {
     }
 
     impl Decryptor for QMCv2 {
-        #[inline(always)]
-        fn get_data(&self) -> &BaseDecryptorData {
-            &self.data
-        }
-
-        #[inline(always)]
-        fn get_data_mut(&mut self) -> &mut BaseDecryptorData {
-            &mut self.data
-        }
+        impl_decryptor_inner_helper! {}
 
         fn write(&mut self, data: &[u8]) -> Result<(), DecryptError> {
             let mut p = data;
@@ -157,8 +150,8 @@ mod detail {
         }
     }
 
-    pub fn new_qmc_v2_rc4<T: AsRef<[u8]>>(key: T) -> impl Decryptor {
-        QMCv2::new(key)
+    pub fn new_qmc_v2_rc4<T: AsRef<[u8]>>(key: T, reserved_eof: usize) -> impl Decryptor {
+        QMCv2::new(key, reserved_eof)
     }
 }
 
@@ -174,7 +167,7 @@ mod test {
         let test_data = generate_test_data(TEST_SIZE_4MB, "qmcv2 rc4 cipher data");
         test_key[0..8].fill(b'4');
 
-        let mut decryptor = super::new_qmc_v2_rc4(test_key);
+        let mut decryptor = super::new_qmc_v2_rc4(test_key, 0);
         let result = decrypt_test_content(&mut decryptor, test_data);
         assert_eq!(
             result,

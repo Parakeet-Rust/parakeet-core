@@ -21,16 +21,24 @@ impl VecExtension for Vec<u8> {
     }
 }
 
-pub trait EndianOp {
-    type Array;
+pub trait IntHelper {
     fn from_le_bytes(bytes: &[u8]) -> Self;
     fn from_be_bytes(bytes: &[u8]) -> Self;
+
+    fn read_le(bytes: &[u8], offset: usize) -> Self;
+    fn read_be(bytes: &[u8], offset: usize) -> Self;
+
+    // faster mod for our use case.
+    // we usually pass in a large offset to look-up values from
+    //   a small table, which is faster than doing div/mul for
+    //   modular calculation.
+    // src: https://stackoverflow.com/a/33333924
+    fn fast_mod(&self, rhs: Self) -> Self;
 }
 
-macro_rules! impl_endian_op (( $($int:ident),* ) => {
+macro_rules! impl_int_helper (( $($int:ident),* ) => {
     $(
-        impl EndianOp for $int {
-            type Array = [u8; std::mem::size_of::<Self>()];
+        impl IntHelper for $int {
             #[inline(always)]
             fn from_le_bytes(bytes: &[u8]) -> Self {
                 Self::from_le_bytes(bytes[..size_of::<Self>()].try_into().unwrap())
@@ -39,12 +47,32 @@ macro_rules! impl_endian_op (( $($int:ident),* ) => {
             fn from_be_bytes(bytes: &[u8]) -> Self {
                 Self::from_be_bytes(bytes[..size_of::<Self>()].try_into().unwrap())
             }
+
+            #[inline(always)]
+            fn read_le(bytes: &[u8], offset: usize) -> Self {
+                Self::from_le_bytes(bytes[offset..offset + size_of::<Self>()].try_into().unwrap())
+            }
+
+            #[inline(always)]
+            fn read_be(bytes: &[u8], offset: usize) -> Self {
+                Self::from_be_bytes(bytes[offset..offset + size_of::<Self>()].try_into().unwrap())
+            }
+
+            #[inline(always)]
+            fn fast_mod(&self, rhs: Self) -> Self {
+                let lhs = *self;
+                if lhs < rhs {
+                    lhs
+                } else {
+                    lhs % rhs
+                }
+            }
         }
     )*
 });
 
-impl_endian_op!(u8, u16, u32, u64, u128, usize);
-impl_endian_op!(i8, i16, i32, i64, i128, isize);
+impl_int_helper!(u8, u16, u32, u64, u128, usize);
+impl_int_helper!(i8, i16, i32, i64, i128, isize);
 
 pub trait USizeable {
     fn to_usize(&self) -> usize;
@@ -79,14 +107,8 @@ impl<T: PrimInt> ArrayExtension<T> for [T] {
     fn get_mod_n<I: USizeable>(&self, i: I) -> T {
         let i = i.to_usize();
 
-        // faster mod for our use case.
-        // we usually pass in a large offset to look-up values from
-        //   a small table, which is faster than doing div/mul for
-        //   modular calculation.
-        // src: https://stackoverflow.com/a/33333924
         let n = self.len();
-        let i = if i < n { i } else { i % n };
-        self.get_value_unchecked(i)
+        self.get_value_unchecked(i.fast_mod(n))
     }
     #[inline(always)]
     fn swap_unsigned_index<I: USizeable, J: USizeable>(&mut self, a: I, b: J) {
@@ -99,7 +121,8 @@ impl<T: PrimInt> ArrayExtension<T> for [T] {
 }
 
 pub trait ByteSliceExt {
-    fn read_le<R: PrimInt + EndianOp>(&self, offset: usize) -> R;
+    fn read_le<R: PrimInt + IntHelper>(&self, offset: usize) -> R;
+    fn read_be<R: PrimInt + IntHelper>(&self, offset: usize) -> R;
 
     fn xor_key_with_key_offset<T: AsRef<[u8]>>(&mut self, key: T, offset: usize);
     #[inline(always)]
@@ -112,8 +135,12 @@ pub trait ByteSliceExt {
 
 impl ByteSliceExt for [u8] {
     #[inline(always)]
-    fn read_le<R: PrimInt + EndianOp>(&self, offset: usize) -> R {
-        R::from_le_bytes(&self[offset..])
+    fn read_le<R: PrimInt + IntHelper>(&self, offset: usize) -> R {
+        R::read_le(self, offset)
+    }
+    #[inline(always)]
+    fn read_be<R: PrimInt + IntHelper>(&self, offset: usize) -> R {
+        R::read_be(self, offset)
     }
 
     #[inline(always)]

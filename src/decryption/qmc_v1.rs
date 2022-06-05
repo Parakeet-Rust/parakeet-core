@@ -1,6 +1,7 @@
 mod detail {
     use crate::{
         decryptor::{BaseDecryptorData, DecryptError, Decryptor},
+        impl_decryptor_inner_helper,
         utils::array_ext::{ArrayExtension, ByteSliceExt, VecExtension},
     };
 
@@ -48,9 +49,9 @@ mod detail {
 
     impl<T: QmcV1Algo> QMCv1<T> {
         #[inline(always)]
-        pub fn new<K: AsRef<[u8]>>(key: K) -> Self {
+        pub fn new<K: AsRef<[u8]>>(key: K, eof_reserve: usize) -> Self {
             let mut result = Self {
-                data: BaseDecryptorData::new("QMCv1"),
+                data: BaseDecryptorData::new_with_eof_reserve("QMCv1", eof_reserve),
                 extra_cache_value: 0,
                 cache: [0u8; STATIC_CIPHER_PAGE_SIZE],
                 _algo: T::new(),
@@ -70,15 +71,7 @@ mod detail {
     }
 
     impl<T: QmcV1Algo> Decryptor for QMCv1<T> {
-        #[inline(always)]
-        fn get_data(&self) -> &BaseDecryptorData {
-            &self.data
-        }
-
-        #[inline(always)]
-        fn get_data_mut(&mut self) -> &mut BaseDecryptorData {
-            &mut self.data
-        }
+        impl_decryptor_inner_helper! {}
 
         fn write(&mut self, data: &[u8]) -> Result<(), DecryptError> {
             let n = data.len();
@@ -97,16 +90,16 @@ mod detail {
     }
 
     pub fn new_qmc_v1_static(key: &[u8]) -> impl Decryptor {
-        QMCv1::<QmcV1StaticAlgo<80923>>::new(key)
+        QMCv1::<QmcV1StaticAlgo<80923>>::new(key, 0)
     }
 
-    pub fn new_qmc_v2_map(key: &[u8]) -> impl Decryptor {
-        QMCv1::<QmcV2MapAlgo<71214>>::new(key)
+    pub fn new_qmc_v1_map<T: AsRef<[u8]>>(key: T, eof_reserve: usize) -> impl Decryptor {
+        QMCv1::<QmcV2MapAlgo<71214>>::new(key, eof_reserve)
     }
 }
 
+pub use detail::new_qmc_v1_map;
 pub use detail::new_qmc_v1_static;
-pub use detail::new_qmc_v2_map;
 
 #[cfg(test)]
 mod test {
@@ -130,7 +123,7 @@ mod test {
         let test_key = generate_test_data(256, "qmcv1 map cipher derived key");
         let test_data = generate_test_data(TEST_SIZE_4MB, "qmcv1 map cipher data");
 
-        let mut decryptor = super::new_qmc_v2_map(test_key.as_slice());
+        let mut decryptor = super::new_qmc_v1_map(test_key.as_slice(), 0);
         let result = decrypt_test_content(&mut decryptor, test_data.as_slice());
         assert_eq!(
             result,

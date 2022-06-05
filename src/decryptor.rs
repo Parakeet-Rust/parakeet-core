@@ -4,6 +4,7 @@ pub struct BaseDecryptorData {
     pub(crate) offset: usize,
     pub(crate) buf_in: Vec<u8>,
     pub(crate) buf_out: Vec<u8>,
+    pub(crate) reserve_eof: usize,
 }
 
 #[derive(Debug)]
@@ -33,12 +34,25 @@ impl DecryptError {
 }
 
 impl BaseDecryptorData {
-    pub fn new(name: &str) -> Self {
+    #[inline(always)]
+    pub(crate) fn new(name: &str) -> Self {
         BaseDecryptorData {
             buf_in: vec![],
             buf_out: vec![],
             offset: 0,
             name: String::from(name),
+            reserve_eof: 0,
+        }
+    }
+
+    #[inline(always)]
+    pub(crate) fn new_with_eof_reserve(name: &str, reserve_len: usize) -> Self {
+        BaseDecryptorData {
+            buf_in: vec![],
+            buf_out: vec![],
+            offset: 0,
+            name: String::from(name),
+            reserve_eof: reserve_len,
         }
     }
 
@@ -96,19 +110,33 @@ impl BaseDecryptorData {
 }
 
 pub trait Decryptor {
+    fn write(&mut self, data: &[u8]) -> Result<(), DecryptError>;
+    #[inline(always)]
     fn end(&mut self) -> bool {
         true
     }
 
-    fn get_name(&self) -> &str {
-        &self.get_data().name
-    }
+    fn get_name(&self) -> &str;
+    fn read_all_output(&mut self) -> Vec<u8>;
+    fn get_eof_reserve(&self) -> usize;
+}
 
-    fn write(&mut self, data: &[u8]) -> Result<(), DecryptError>;
-    fn read_all_output(&mut self) -> Vec<u8> {
-        self.get_data_mut().read_all_output()
-    }
+#[macro_export]
+macro_rules! impl_decryptor_inner_helper {
+    () => {
+        #[inline(always)]
+        fn get_name(&self) -> &str {
+            &self.data.name
+        }
 
-    fn get_data(&self) -> &BaseDecryptorData;
-    fn get_data_mut(&mut self) -> &mut BaseDecryptorData;
+        #[inline(always)]
+        fn read_all_output(&mut self) -> Vec<u8> {
+            self.data.read_all_output()
+        }
+
+        #[inline(always)]
+        fn get_eof_reserve(&self) -> usize {
+            self.data.reserve_eof
+        }
+    };
 }

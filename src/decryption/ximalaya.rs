@@ -10,6 +10,7 @@ mod detail {
     use super::{ScrambleTable, X2MContentKey, X3MContentKey, XMLY_SCRAMBLE_SIZE};
     use crate::{
         decryptor::{BaseDecryptorData, DecryptError, Decryptor},
+        impl_decryptor_inner_helper,
         utils::array_ext::ArrayExtension,
     };
 
@@ -51,12 +52,7 @@ mod detail {
     }
 
     impl<const KEY_SIZE: usize> Decryptor for Ximalaya<[u8; KEY_SIZE]> {
-        fn get_data(&self) -> &BaseDecryptorData {
-            &self.data
-        }
-        fn get_data_mut(&mut self) -> &mut BaseDecryptorData {
-            &mut self.data
-        }
+        impl_decryptor_inner_helper! {}
 
         fn write(&mut self, data: &[u8]) -> Result<(), DecryptError> {
             let mut p = data;

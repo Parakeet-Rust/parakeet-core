@@ -18,6 +18,7 @@ mod detail {
     use super::NCMAudioKey;
     use crate::{
         decryptor::{BaseDecryptorData, DecryptError, DecryptErrorCode, Decryptor},
+        impl_decryptor_inner_helper,
         utils::{
             aes_ecb::Aes128EcbDec,
             array_ext::ByteSliceExt,
@@ -59,15 +60,7 @@ mod detail {
     }
 
     impl Decryptor for NeteaseDecryptor {
-        #[inline(always)]
-        fn get_data(&self) -> &BaseDecryptorData {
-            &self.data
-        }
-
-        #[inline(always)]
-        fn get_data_mut(&mut self) -> &mut BaseDecryptorData {
-            &mut self.data
-        }
+        impl_decryptor_inner_helper! {}
 
         fn write(&mut self, data: &[u8]) -> Result<(), DecryptError> {
             let mut p = data;
