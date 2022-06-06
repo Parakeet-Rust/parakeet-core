@@ -1,6 +1,6 @@
 use crate::{impl_rc4_init, utils::array_ext::ArrayExtension};
 
-use super::rc4::RC4Derive;
+use super::RC4Derive;
 
 pub struct RC4TencentQmcV2 {
     s: Vec<u8>,

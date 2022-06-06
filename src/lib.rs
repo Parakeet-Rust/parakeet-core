@@ -1,7 +1,7 @@
 pub mod decryption;
 pub mod decryptor;
 pub mod tencent;
-mod utils;
+pub mod utils;
 
 #[cfg(test)]
 mod tests {

@@ -3,7 +3,7 @@ pub mod test {
 
     use crate::{
         decryptor::Decryptor,
-        utils::rc4::{rc4::RC4Derive, RC4Standard},
+        utils::rc4::{RC4Derive, RC4Standard},
     };
     use ring::digest::{Context, SHA256};
 

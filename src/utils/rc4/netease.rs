@@ -1,6 +1,6 @@
 use crate::{impl_rc4_state_getter, utils::array_ext::ArrayExtension};
 
-use super::rc4::{RC4Derive, RC4State};
+use super::{RC4Derive, RC4State};
 
 pub struct RC4Netease {
     state: RC4State,

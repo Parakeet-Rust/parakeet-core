@@ -22,7 +22,7 @@ mod detail {
         utils::{
             aes_ecb::Aes128EcbDec,
             array_ext::ByteSliceExt,
-            rc4::{rc4::RC4Derive, RC4Netease},
+            rc4::{RC4Derive, RC4Netease},
         },
     };
     use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, KeyInit};

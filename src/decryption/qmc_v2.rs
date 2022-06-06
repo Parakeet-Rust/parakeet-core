@@ -4,7 +4,7 @@ mod detail {
         impl_decryptor_inner_helper,
         utils::{
             array_ext::ArrayExtension,
-            rc4::{rc4::RC4Derive, RC4TencentQmcV2},
+            rc4::{RC4Derive, RC4TencentQmcV2},
         },
     };
     use std::ops::Div;
