@@ -121,22 +121,24 @@ pub trait Decryptor {
     fn get_eof_reserve(&self) -> usize;
 }
 
-#[macro_export]
-macro_rules! impl_decryptor_inner_helper {
-    () => {
-        #[inline(always)]
-        fn get_name(&self) -> &str {
-            &self.data.name
-        }
+mod detail {
+    #[macro_export]
+    macro_rules! impl_decryptor_inner_helper {
+        () => {
+            #[inline(always)]
+            fn get_name(&self) -> &str {
+                &self.data.name
+            }
 
-        #[inline(always)]
-        fn read_all_output(&mut self) -> Vec<u8> {
-            self.data.read_all_output()
-        }
+            #[inline(always)]
+            fn read_all_output(&mut self) -> Vec<u8> {
+                self.data.read_all_output()
+            }
 
-        #[inline(always)]
-        fn get_eof_reserve(&self) -> usize {
-            self.data.reserve_eof
-        }
-    };
+            #[inline(always)]
+            fn get_eof_reserve(&self) -> usize {
+                self.data.reserve_eof
+            }
+        };
+    }
 }
