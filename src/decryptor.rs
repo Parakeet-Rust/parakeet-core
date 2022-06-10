@@ -112,8 +112,8 @@ impl BaseDecryptorData {
 pub trait Decryptor {
     fn write(&mut self, data: &[u8]) -> Result<(), DecryptError>;
     #[inline(always)]
-    fn end(&mut self) -> bool {
-        true
+    fn end(&mut self) -> Result<(), DecryptError> {
+        Ok(())
     }
 
     fn get_name(&self) -> &str;

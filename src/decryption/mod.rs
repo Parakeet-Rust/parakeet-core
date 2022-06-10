@@ -1,3 +1,4 @@
+pub mod joox;
 pub mod kugou;
 pub mod kuwo;
 pub mod ncm;
